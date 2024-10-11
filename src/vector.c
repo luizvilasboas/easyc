@@ -47,7 +47,7 @@ void vector_insert(Vector *vector, void *data) {
     vector->head = new_node;
 }
 
-void list_remove(Vector *vector, int (*cmp_fn)(void *, void *), void *key) {
+void vector_remove(Vector *vector, int (*cmp_fn)(void *, void *), void *key) {
     VectorNode *current = vector->head;
     VectorNode *previous = NULL;
 
@@ -87,7 +87,7 @@ void *vector_search(Vector *vector, int (*cmp_fn)(void *, void *), void *key) {
     return NULL;
 }
 
-void *vector_foreach(Vector *vector, void (*fn)(void *)) {
+void vector_foreach(Vector *vector, void (*fn)(void *)) {
     VectorNode *current = vector->head;
 
     while (current != NULL) {
