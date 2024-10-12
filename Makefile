@@ -5,20 +5,23 @@ LDFLAGS=-lcheck -lsubunit -lm
 SCR_DIR=src
 INCLUDE_DIR=includes
 TEST_DIR=tests
-TARGET=vector_test
+BIN_DIR=bin
 
-SRC=$(SCR_DIR)/vector.c
-TEST_SRC=$(TEST_DIR)/vector_test.c
+SRC_FILES=$(wildcard $(SCR_DIR)/*.c)
+TEST_FILES=$(wildcard $(TEST_DIR)/*_test.c)
 
-all: $(TARGET)
+TEST_TARGETS=$(patsubst $(TEST_DIR)/%_test.c,$(BIN_DIR)/%_test,$(TEST_FILES))
 
-$(TARGET): $(SRC) $(TEST_SRC)
-	$(CC) $(CFLAGS) -o $(TARGET) $(SRC) $(TEST_SRC) $(LDFLAGS)
+all: $(TEST_TARGETS)
 
-test: $(TARGET)
-	./$(TARGET)
+$(BIN_DIR)/%_test: $(SCR_DIR)/%.c $(TEST_DIR)/%_test.c
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
+test: $(TEST_TARGETS)
+	@for test in $(TEST_TARGETS); do ./$$test || exit 1; done
 
 clean:
-	rm -rf $(TARGET)
+	rm -rf $(BIN_DIR)
 
 .PHONY: all test clean
