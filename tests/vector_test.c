@@ -103,7 +103,7 @@ Suite *generic_list_suite(void) {
     Suite *s;
     TCase *tc_core;
 
-    s = suite_create("Generic List");
+    s = suite_create("Vector List");
 
     tc_core = tcase_create("Core");
 
