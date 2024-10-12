@@ -5,12 +5,8 @@
 
 int sum;
 
-int compare_int(void *a, void *b) {
+int cmp_int(void *a, void *b) {
     return (*(int *) a) - (*(int *) b);
-}
-
-void free_int(void *data) {
-    free(data);
 }
 
 void sum_int(void *data) {
@@ -19,17 +15,16 @@ void sum_int(void *data) {
 
 START_TEST(test_vector_init) {
     Vector vector;
-    vector_init(&vector, sizeof(int), NULL);
+    vector_init(&vector, sizeof(int));
     ck_assert_ptr_null(vector.head);
     ck_assert_int_eq(vector.element_size, sizeof(int));
-    ck_assert_ptr_null(vector.free_n);
     vector_destroy(&vector);
 }
 END_TEST
 
 START_TEST(test_vector_insert) {
     Vector vector;
-    vector_init(&vector, sizeof(int), NULL);
+    vector_init(&vector, sizeof(int));
 
     int value = 42;
     vector_insert(&vector, &value);
@@ -42,7 +37,7 @@ END_TEST
 
 START_TEST(test_vector_remove) {
     Vector vector;
-    vector_init(&vector, sizeof(int), NULL);
+    vector_init(&vector, sizeof(int));
 
     int values[] = {5, 10, 15};
     for (int i = 0; i < 3; i++) {
@@ -50,7 +45,7 @@ START_TEST(test_vector_remove) {
     }
 
     int key = 10;
-    vector_remove(&vector, compare_int, &key);
+    vector_remove(&vector, cmp_int, &key);
 
     VectorNode *current = vector.head;
     while (current != NULL) {
@@ -64,7 +59,7 @@ END_TEST
 
 START_TEST(test_vector_search) {
     Vector vector;
-    vector_init(&vector, sizeof(int), NULL);
+    vector_init(&vector, sizeof(int));
 
     int values[] = {5, 10, 15};
     for (int i = 0; i < 3; i++) {
@@ -72,7 +67,7 @@ START_TEST(test_vector_search) {
     }
 
     int key = 10;
-    void *found = vector_search(&vector, compare_int, &key);
+    void *found = vector_search(&vector, cmp_int, &key);
 
     ck_assert_ptr_nonnull(found);
     ck_assert_int_eq(*(int *)found, 10);
@@ -84,7 +79,7 @@ END_TEST
 START_TEST(test_vector_foreach) {
     Vector vector;
 
-    vector_init(&vector, sizeof(int), NULL);
+    vector_init(&vector, sizeof(int));
 
     int values[] = {1, 2, 3, 4, 5};
     for (int i = 0; i < 5; i++) {
@@ -103,7 +98,7 @@ Suite *generic_list_suite(void) {
     Suite *s;
     TCase *tc_core;
 
-    s = suite_create("Vector List");
+    s = suite_create("Generic Vector");
 
     tc_core = tcase_create("Core");
 

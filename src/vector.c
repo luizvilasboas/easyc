@@ -14,10 +14,9 @@ static VectorNode *create_vector_node(void *data, size_t element_size) {
     return node;
 }
 
-void vector_init(Vector *vector, size_t element_size, void (*free_fn)(void *)) {
+void vector_init(Vector *vector, size_t element_size) {
     vector->head = NULL;
     vector->element_size = element_size;
-    vector->free_n = free_fn;
 }
 
 
@@ -27,10 +26,6 @@ void vector_destroy(Vector *vector) {
 
     while (current != NULL) {
         next = current->next;
-
-        if (vector->free_n) {
-            vector->free_n(current->data);
-        }
 
         free(current->data);
         free(current);
@@ -57,10 +52,6 @@ void vector_remove(Vector *vector, int (*cmp_fn)(void *, void *), void *key) {
                 vector->head = current->next;
             } else {
                 previous->next = current->next;
-            }
-
-            if (vector->free_n) {
-                vector->free_n(current->data);
             }
 
             free(current->data);

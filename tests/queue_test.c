@@ -4,17 +4,19 @@
 
 #include "../includes/queue.h"
 
+int sum;
+
 int cmp_int(void *a, void *b) {
     return (*(int *)a) - (*(int *)b);
 }
 
-void print_int(void *data) {
-    printf("%d ", *(int *)data);
+void sum_int(void *data) {
+    sum += *(int *) data;
 }
 
 START_TEST(test_queue_init) {
     Queue queue;
-    queue_init(&queue, sizeof(int), NULL);
+    queue_init(&queue, sizeof(int));
 
     ck_assert_ptr_null(queue.front);
     ck_assert_ptr_null(queue.rear);
@@ -25,7 +27,7 @@ END_TEST
 
 START_TEST(test_queue_enqueue) {
     Queue queue;
-    queue_init(&queue, sizeof(int), NULL);
+    queue_init(&queue, sizeof(int));
 
     int value = 42;
     queue_enqueue(&queue, &value);
@@ -41,7 +43,7 @@ END_TEST
 
 START_TEST(test_queue_dequeue) {
     Queue queue;
-    queue_init(&queue, sizeof(int), NULL);
+    queue_init(&queue, sizeof(int));
 
     int values[] = {1, 2, 3};
     for (int i = 0; i < 3; i++) {
@@ -64,7 +66,7 @@ END_TEST
 
 START_TEST(test_queue_search) {
     Queue queue;
-    queue_init(&queue, sizeof(int), NULL);
+    queue_init(&queue, sizeof(int));
 
     int values[] = {10, 20, 30};
     for (int i = 0; i < 3; i++) {
@@ -86,16 +88,17 @@ END_TEST
 
 START_TEST(test_queue_foreach) {
     Queue queue;
-    queue_init(&queue, sizeof(int), NULL);
+    queue_init(&queue, sizeof(int));
 
     int values[] = {5, 15, 25};
     for (int i = 0; i < 3; i++) {
         queue_enqueue(&queue, &values[i]);
     }
 
-    printf("Foreach output: ");
-    queue_foreach(&queue, print_int);
-    printf("\n");
+    sum = 0;
+    queue_foreach(&queue, sum_int);
+
+    ck_assert_int_eq(sum, 45);
 
     queue_destroy(&queue);
 }
