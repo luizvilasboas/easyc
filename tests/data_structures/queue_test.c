@@ -2,7 +2,7 @@
 #include <check.h>
 #include <stdlib.h>
 
-#include "../includes/queue.h"
+#include "../../includes/data_structures/queue.h"
 
 int sum;
 

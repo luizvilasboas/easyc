@@ -1,7 +1,7 @@
 #include <check.h>
 #include <stdlib.h>
 
-#include "../includes/stack.h"
+#include "../../includes/data_structures/stack.h"
 
 int sum;
 

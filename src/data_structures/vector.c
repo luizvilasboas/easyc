@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../includes/vector.h"
+#include "../../includes/data_structures/vector.h"
 
 static VectorNode *create_vector_node(void *data, size_t element_size) {
     VectorNode *node = (VectorNode *) malloc(sizeof(VectorNode));

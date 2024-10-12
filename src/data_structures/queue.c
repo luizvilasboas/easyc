@@ -2,7 +2,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "../includes/queue.h"
+#include "../../includes/data_structures/queue.h"
 
 void queue_init(Queue *queue, size_t element_size) {
     queue->front = NULL;

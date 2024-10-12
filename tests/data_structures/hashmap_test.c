@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "../includes/hashmap.h"
+#include "../../includes/data_structures/hashmap.h"
 
 int sum;
 

@@ -2,24 +2,30 @@ CC=gcc
 CFLAGS=-Wall -Wextra -g
 LDFLAGS=-lcheck -lsubunit -lm
 
-SCR_DIR=src
+SRC_DIR=src
 INCLUDE_DIR=includes
 TEST_DIR=tests
 BIN_DIR=bin
+SUB_DIRS=$(BIN_DIR)/data_structures
 
-SRC_FILES=$(wildcard $(SCR_DIR)/*.c)
-TEST_FILES=$(wildcard $(TEST_DIR)/*_test.c)
+SRC=$(shell find $(SRC_DIR) -name '*.c')
+TEST_SRC=$(shell find $(TEST_DIR) -name '*_test.c')
 
-TEST_TARGETS=$(patsubst $(TEST_DIR)/%_test.c,$(BIN_DIR)/%_test,$(TEST_FILES))
+BINARIES=$(patsubst $(TEST_DIR)/%_test.c, $(BIN_DIR)/%_test, $(TEST_SRC))
 
-all: $(TEST_TARGETS)
+all: $(BINARIES)
 
-$(BIN_DIR)/%_test: $(SCR_DIR)/%.c $(TEST_DIR)/%_test.c
-	@mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+$(BIN_DIR)/%_test: $(SRC_DIR)/%.c $(TEST_DIR)/%_test.c | $(SUB_DIR)
+	$(CC) $(CFLAGS) -I$(INCLUDE_DIR) -o $@ $^ $(LDFLAGS)
 
-test: $(TEST_TARGETS)
-	@for test in $(TEST_TARGETS); do ./$$test || exit 1; done
+$(SUB_DIRS):
+	mkdir -p $@
+
+test: all
+	@for test_bin in $(BINARIES); do \
+		echo "Running $$test_bin..."; \
+		./$$test_bin; \
+	done
 
 clean:
 	rm -rf $(BIN_DIR)

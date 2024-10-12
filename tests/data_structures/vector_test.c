@@ -1,7 +1,7 @@
 #include <check.h>
 #include <stdlib.h>
 
-#include "../includes/vector.h"
+#include "../../includes/data_structures/vector.h"
 
 int sum;
 
