@@ -93,6 +93,137 @@ START_TEST(test_vector_foreach) {
 
     vector_destroy(&vector);
 }
+END_TEST
+
+START_TEST(test_vector_insert_at) {
+    Vector vector;
+    vector_init(&vector, sizeof(int));
+
+    int data1 = 1, data2 = 2, data3 = 3;
+
+    vector_insert(&vector, &data1);
+    vector_insert_at(&vector, 1, &data3);
+    vector_insert_at(&vector, 1, &data2);
+
+    int *found1 = (int *)vector_search(&vector, cmp_int, &data1);
+    int *found2 = (int *)vector_search(&vector, cmp_int, &data2);
+    int *found3 = (int *)vector_search(&vector, cmp_int, &data3);
+
+    ck_assert_ptr_nonnull(found1);
+    ck_assert_ptr_nonnull(found2);
+    ck_assert_ptr_nonnull(found3);
+    ck_assert_int_eq(*found1, 1);
+    ck_assert_int_eq(*found2, 2);
+    ck_assert_int_eq(*found3, 3);
+
+    vector_destroy(&vector);
+}
+END_TEST
+
+START_TEST(test_vector_remove_at) {
+    Vector vector;
+    vector_init(&vector, sizeof(int));
+
+    int data1 = 1, data2 = 2, data3 = 3;
+
+    vector_insert(&vector, &data1);
+    vector_insert(&vector, &data2);
+    vector_insert(&vector, &data3);
+
+    vector_remove_at(&vector, 1);
+
+    int *found1 = (int *)vector_search(&vector, cmp_int, &data1);
+    int *found2 = (int *)vector_search(&vector, cmp_int, &data2);
+    int *found3 = (int *)vector_search(&vector, cmp_int, &data3);
+
+    ck_assert_ptr_nonnull(found1);
+    ck_assert_ptr_null(found2);
+    ck_assert_ptr_nonnull(found3);
+
+    ck_assert_int_eq(*found1, 1);
+    ck_assert_int_eq(*found3, 3);
+
+    vector_destroy(&vector);
+}
+END_TEST
+
+START_TEST(test_vector_find) {
+    Vector vector;
+    vector_init(&vector, sizeof(int));
+
+    int data1 = 1, data2 = 2, data3 = 3;
+
+    vector_insert(&vector, &data1);
+    vector_insert(&vector, &data2);
+    vector_insert(&vector, &data3);
+
+    int index1 = vector_find(&vector, cmp_int, &data1);
+    int index2 = vector_find(&vector, cmp_int, &data2);
+    int index3 = vector_find(&vector, cmp_int, &data3);
+
+    ck_assert_int_eq(index1, 2);
+    ck_assert_int_eq(index2, 1);
+    ck_assert_int_eq(index3, 0);
+
+    vector_destroy(&vector);
+}
+END_TEST
+
+START_TEST(test_vector_reverse) {
+    Vector vector;
+    vector_init(&vector, sizeof(int));
+
+    int data1 = 1, data2 = 2, data3 = 3;
+
+    vector_insert(&vector, &data1);
+    vector_insert(&vector, &data2);
+    vector_insert(&vector, &data3);
+
+    vector_reverse(&vector);
+
+    int *found1 = (int *)vector_search(&vector, cmp_int, &data1);
+    int *found2 = (int *)vector_search(&vector, cmp_int, &data2);
+    int *found3 = (int *)vector_search(&vector, cmp_int, &data3);
+
+    ck_assert_ptr_nonnull(found1);
+    ck_assert_ptr_nonnull(found2);
+    ck_assert_ptr_nonnull(found3);
+
+    ck_assert_int_eq(*found1, 1);
+    ck_assert_int_eq(*found2, 2);
+    ck_assert_int_eq(*found3, 3);
+
+    vector_destroy(&vector);
+}
+END_TEST
+
+START_TEST(test_vector_sort) {
+    Vector vector;
+    vector_init(&vector, sizeof(int));
+
+    int data1 = 3, data2 = 1, data3 = 2;
+
+    vector_insert(&vector, &data1);
+    vector_insert(&vector, &data2);
+    vector_insert(&vector, &data3);
+
+    vector_sort(&vector, cmp_int);
+
+    int *found1 = (int *)vector_search(&vector, cmp_int, &data1);
+    int *found2 = (int *)vector_search(&vector, cmp_int, &data2);
+    int *found3 = (int *)vector_search(&vector, cmp_int, &data3);
+
+    ck_assert_ptr_nonnull(found1);
+    ck_assert_ptr_nonnull(found2);
+    ck_assert_ptr_nonnull(found3);
+
+    ck_assert_int_eq(*found1, 3);
+    ck_assert_int_eq(*found2, 1);
+    ck_assert_int_eq(*found3, 2);
+
+    vector_destroy(&vector);
+}
+END_TEST
 
 Suite *generic_list_suite(void) {
     Suite *s;
@@ -107,6 +238,11 @@ Suite *generic_list_suite(void) {
     tcase_add_test(tc_core, test_vector_remove);
     tcase_add_test(tc_core, test_vector_search);
     tcase_add_test(tc_core, test_vector_foreach);
+    tcase_add_test(tc_core, test_vector_insert_at);
+    tcase_add_test(tc_core, test_vector_remove_at);
+    tcase_add_test(tc_core, test_vector_find);
+    tcase_add_test(tc_core, test_vector_reverse);
+    tcase_add_test(tc_core, test_vector_sort);
     suite_add_tcase(s, tc_core);
 
     return s;

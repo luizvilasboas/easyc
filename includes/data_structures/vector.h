@@ -11,6 +11,7 @@ typedef struct VectorNode {
 typedef struct Vector {
     VectorNode *head;
     size_t element_size;
+    size_t size;
 } Vector;
 
 void vector_init(Vector *vector, size_t element_size);
@@ -19,5 +20,10 @@ void vector_insert(Vector *vector, void *data);
 void vector_remove(Vector *vector, int (*cmp_fn)(void *, void *), void *key);
 void *vector_search(Vector *vector, int (*cmp_fn)(void *, void *), void *key);
 void vector_foreach(Vector *vector, void (*fn)(void *));
+void vector_insert_at(Vector *vector, size_t index, void *data);
+void vector_remove_at(Vector *vector, size_t index);
+int vector_find(Vector *vector, int (*cmp_fn)(void *, void *), void *key);
+void vector_reverse(Vector *vector);
+void vector_sort(Vector *vector, int (*cmp_fn)(void *, void *));
 
 #endif // VECTOR_H_
