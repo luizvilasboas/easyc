@@ -13,9 +13,9 @@ TEST_SRC=$(shell find $(TEST_DIR) -name '*_test.c')
 
 BINARIES=$(patsubst $(TEST_DIR)/%_test.c, $(BIN_DIR)/%_test, $(TEST_SRC))
 
-all: $(BINARIES)
+all: $(SUB_DIRS) $(BINARIES)
 
-$(BIN_DIR)/%_test: $(SRC_DIR)/%.c $(TEST_DIR)/%_test.c | $(SUB_DIR)
+$(BIN_DIR)/%_test: $(SRC_DIR)/%.c $(TEST_DIR)/%_test.c
 	$(CC) $(CFLAGS) -I$(INCLUDE_DIR) -o $@ $^ $(LDFLAGS)
 
 $(SUB_DIRS):
