@@ -1,64 +1,66 @@
-#include <stdio.h>
 #include <check.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "../../includes/data_structures/queue.h"
 
-int sum;
-
-int cmp_int(void *a, void *b) {
-    return (*(int *)a) - (*(int *)b);
-}
-
-void sum_int(void *data) {
-    sum += *(int *) data;
+int cmp_fn(void *a, void *b) {
+    return (*(int *) a - *(int *) b);
 }
 
 START_TEST(test_queue_init) {
     Queue queue;
     queue_init(&queue, sizeof(int));
 
-    ck_assert_ptr_null(queue.front);
-    ck_assert_ptr_null(queue.rear);
-    ck_assert_int_eq(queue.element_size, sizeof(int));
-    queue_destroy(&queue);
-}
-END_TEST
-
-START_TEST(test_queue_enqueue) {
-    Queue queue;
-    queue_init(&queue, sizeof(int));
-
-    int value = 42;
-    queue_enqueue(&queue, &value);
-
-    ck_assert_ptr_nonnull(queue.front);
-    ck_assert_ptr_nonnull(queue.rear);
-    ck_assert_int_eq(*(int *)queue.front->data, 42);
-    ck_assert_int_eq(*(int *)queue.rear->data, 42);
+    ck_assert_int_eq(queue.size, 0);
+    ck_assert_ptr_eq(queue.front, NULL);
+    ck_assert_ptr_eq(queue.rear, NULL);
 
     queue_destroy(&queue);
 }
 END_TEST
 
-START_TEST(test_queue_dequeue) {
+START_TEST(test_queue_push) {
     Queue queue;
     queue_init(&queue, sizeof(int));
 
-    int values[] = {1, 2, 3};
-    for (int i = 0; i < 3; i++) {
-        queue_enqueue(&queue, &values[i]);
-    }
+    int a = 1, b = 2;
 
-    int dequeued_value;
-    queue_dequeue(&queue, &dequeued_value);
-    ck_assert_int_eq(dequeued_value, 1);
+    ck_assert_int_eq(queue_push(&queue, &a), 1);
+    ck_assert_int_eq(queue.size, 1);
+    ck_assert_ptr_ne(queue.front, NULL);
+    ck_assert_ptr_ne(queue.rear, NULL);
 
-    queue_dequeue(&queue, &dequeued_value);
-    ck_assert_int_eq(dequeued_value, 2);
+    int *data = (int *) queue.front->data;
+    ck_assert_int_eq(*data, 1);
 
-    queue_dequeue(&queue, &dequeued_value);
-    ck_assert_int_eq(dequeued_value, 3);
+    ck_assert_int_eq(queue_push(&queue, &b), 1);
+    ck_assert_int_eq(queue.size, 2);
+
+    data = (int *) queue.rear->data;
+    ck_assert_int_eq(*data, 2);
+
+    queue_destroy(&queue);
+}
+END_TEST
+
+START_TEST(test_queue_pop) {
+    Queue queue;
+    queue_init(&queue, sizeof(int));
+
+    int a = 1, b = 2;
+
+    queue_push(&queue, &a);
+    queue_push(&queue, &b);
+
+    ck_assert_int_eq(queue_pop(&queue), 1);
+    ck_assert_int_eq(queue.size, 1);
+    ck_assert_int_eq(*(int *) queue.front->data, 2);
+
+    ck_assert_int_eq(queue_pop(&queue), 1);
+    ck_assert_int_eq(queue.size, 0);
+    ck_assert_ptr_eq(queue.front, NULL);
+    ck_assert_ptr_eq(queue.rear, NULL);
 
     queue_destroy(&queue);
 }
@@ -68,108 +70,52 @@ START_TEST(test_queue_search) {
     Queue queue;
     queue_init(&queue, sizeof(int));
 
-    int values[] = {10, 20, 30};
-    for (int i = 0; i < 3; i++) {
-        queue_enqueue(&queue, &values[i]);
-    }
+    int a = 1, b = 2, c = 3;
 
-    int target = 20;
-    int *found = (int *)queue_search(&queue, cmp_int, &target);
-    ck_assert_ptr_nonnull(found);
-    ck_assert_int_eq(*found, 20);
+    queue_push(&queue, &a);
+    queue_push(&queue, &b);
+    queue_push(&queue, &c);
 
-    int not_found_value = 100;
-    found = (int *)queue_search(&queue, cmp_int, &not_found_value);
-    ck_assert_ptr_null(found);
+    ck_assert_int_eq(queue_search(&queue, cmp_fn, &a), 0);
+    ck_assert_int_eq(queue_search(&queue, cmp_fn, &b), 1);
+    ck_assert_int_eq(queue_search(&queue, cmp_fn, &c), 2);
 
     queue_destroy(&queue);
 }
 END_TEST
 
-START_TEST(test_queue_foreach) {
+START_TEST(test_queue_destroy) {
     Queue queue;
     queue_init(&queue, sizeof(int));
 
-    int values[] = {5, 15, 25};
-    for (int i = 0; i < 3; i++) {
-        queue_enqueue(&queue, &values[i]);
-    }
+    int a = 1;
 
-    sum = 0;
-    queue_foreach(&queue, sum_int);
+    queue_push(&queue, &a);
 
-    ck_assert_int_eq(sum, 45);
+    queue_destroy(&queue);
+    ck_assert_int_eq(queue.size, 0);
+    ck_assert_ptr_eq(queue.front, NULL);
+    ck_assert_ptr_eq(queue.rear, NULL);
+    ck_assert_int_eq(queue.element_size, 0);
 
     queue_destroy(&queue);
 }
 END_TEST
 
-START_TEST(test_queue_size) {
-    Queue queue;
-    queue_init(&queue, sizeof(int));
-
-    int a = 1, b = 2;
-    queue_enqueue(&queue, &a);
-    queue_enqueue(&queue, &b);
-
-    ck_assert_int_eq(queue_size(&queue), 2);
-
-    queue_destroy(&queue);
-}
-END_TEST
-
-START_TEST(test_queue_peek) {
-    Queue queue;
-    queue_init(&queue, sizeof(int));
-
-    int a = 1, b = 2;
-    queue_enqueue(&queue, &a);
-    queue_enqueue(&queue, &b);
-
-    int *peeked_int = (int *) queue_peek(&queue);
-    ck_assert_int_eq(*peeked_int, 1);
-
-    queue_destroy(&queue);
-}
-END_TEST
-
-START_TEST(test_queue_reverse) {
-    Queue queue;
-    queue_init(&queue, sizeof(int));
-
-    int a = 1, b = 2;
-    queue_enqueue(&queue, &a);
-    queue_enqueue(&queue, &b);
-
-    queue_reverse(&queue);
-
-    int dequeued_int;
-    queue_dequeue(&queue, &dequeued_int);
-    ck_assert_int_eq(dequeued_int, 2);
-
-    queue_dequeue(&queue, &dequeued_int);
-    ck_assert_int_eq(dequeued_int, 1);
-
-    queue_destroy(&queue);
-}
-END_TEST
-
-Suite *generic_queue_suite(void) {
+Suite *queue_suite(void) {
     Suite *s;
     TCase *tc_core;
 
-    s = suite_create("Generic Queue");
+    s = suite_create("Queue");
 
     tc_core = tcase_create("Core");
 
     tcase_add_test(tc_core, test_queue_init);
-    tcase_add_test(tc_core, test_queue_enqueue);
-    tcase_add_test(tc_core, test_queue_dequeue);
+    tcase_add_test(tc_core, test_queue_push);
+    tcase_add_test(tc_core, test_queue_pop);
     tcase_add_test(tc_core, test_queue_search);
-    tcase_add_test(tc_core, test_queue_foreach);
-    tcase_add_test(tc_core, test_queue_size);
-    tcase_add_test(tc_core, test_queue_reverse);
-    tcase_add_test(tc_core, test_queue_peek);
+    tcase_add_test(tc_core, test_queue_destroy);
+
     suite_add_tcase(s, tc_core);
 
     return s;
@@ -180,11 +126,12 @@ int main(void) {
     Suite *s;
     SRunner *sr;
 
-    s = generic_queue_suite();
+    s = queue_suite();
     sr = srunner_create(s);
 
     srunner_run_all(sr, CK_NORMAL);
     number_failed = srunner_ntests_failed(sr);
     srunner_free(sr);
+
     return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

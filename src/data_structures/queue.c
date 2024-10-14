@@ -4,109 +4,125 @@
 
 #include "../../includes/data_structures/queue.h"
 
+static QueueNode *create_queue_node(void *data, size_t element_size) {
+    if (data == NULL || element_size == 0) {
+        return NULL;
+    }
+
+    QueueNode *node = (QueueNode *) malloc(sizeof(QueueNode));
+    if (node == NULL) {
+        return NULL;
+    }
+
+    node->data = malloc(element_size);
+    if (node->data == NULL) {
+        free(node);
+        return NULL;
+    }
+
+    memcpy(node->data, data, element_size);
+    node->next = NULL;
+
+    return node;
+}
+
 void queue_init(Queue *queue, size_t element_size) {
+    if (queue == NULL || element_size == 0) {
+        return;
+    }
+
     queue->front = NULL;
     queue->rear = NULL;
     queue->element_size = element_size;
+    queue->size = 0;
 }
 
 void queue_destroy(Queue *queue) {
-    QueueNode *current = queue->front;
-    while (current != NULL) {
-        QueueNode *tmp = current;
-        current = current->next;
-        free(tmp->data);
-        free(tmp);
+    if (queue == NULL) {
+        return;
     }
+
+    QueueNode *current = queue->front;
+    QueueNode *next;
+
+    while (current != NULL) {
+        next = current->next;
+
+        free(current->data);
+        free(current);
+        current = next;
+    }
+
     queue->front = NULL;
     queue->rear = NULL;
+    queue->size = 0;
+    queue->element_size = 0;
 }
 
-void queue_enqueue(Queue *queue, void *element) {
-    QueueNode *new_node = (QueueNode *)malloc(sizeof(QueueNode));
-    assert(new_node != NULL);
-
-    new_node->data = malloc(queue->element_size);
-    assert(new_node->data != NULL);
-
-    memcpy(new_node->data, element, queue->element_size);
-    new_node->next = NULL;
-
-    if (queue->rear != NULL) {
-        queue->rear->next = new_node;
+bool queue_push(Queue *queue, void *data) {
+    if (queue == NULL || data == NULL) {
+        return false;
     }
 
-    queue->rear = new_node;
+    QueueNode *new_node = create_queue_node(data, queue->element_size);
+    if (new_node == NULL) {
+        return false;
+    }
 
-    if (queue->front == NULL) {
+    if (queue->size == 0) {
         queue->front = new_node;
+        queue->rear = new_node;
+    } else {
+        queue->rear->next = new_node;
+        queue->rear = new_node;
     }
+
+    queue->size++;
+    return true;
 }
 
-void queue_dequeue(Queue *queue, void *element) {
-    assert(queue->front != NULL);
+bool queue_pop(Queue *queue) {
+    if (queue == NULL || queue->size == 0) {
+        return false;
+    }
 
-    QueueNode *old_front = queue->front;
-    memcpy(element, old_front->data, queue->element_size);
-
-    queue->front = old_front->next;
+    QueueNode *temp = queue->front;
+    queue->front = queue->front->next;
 
     if (queue->front == NULL) {
         queue->rear = NULL;
     }
 
-    free(old_front->data);
-    free(old_front);
+    free(temp->data);
+    free(temp);
+    queue->size--;
+    return true;
 }
 
-void *queue_search(Queue *queue, int (*cmp_fn)(void *, void *), void *key) {
+int queue_search(Queue *queue, int (*cmp_fn)(void *, void *), void *key) {
+    if (queue == NULL || cmp_fn == NULL || key == NULL) {
+        return -1;
+    }
+
     QueueNode *current = queue->front;
+    int position = 0;
+
     while (current != NULL) {
         if (cmp_fn(current->data, key) == 0) {
-            return current->data;
+            return position;
         }
 
         current = current->next;
+        position++;
     }
 
-    return NULL;
+    return -1;
 }
 
-void queue_foreach(Queue *queue, void (*fn)(void *)) {
-    QueueNode *current = queue->front;
-    while (current != NULL) {
-        fn(current->data);
-        current = current->next;
-    }
-}
-
-size_t queue_size(Queue *queue) {
-    size_t size = 0;
-    QueueNode *current = queue->front;
-    while (current != NULL) {
-        size++;
-        current = current->next;
-    }
-    return size;
-}
-
-void *queue_peek(Queue *queue) {
-    if (queue->front != NULL) {
-        return queue->front->data;
-    }
-    return NULL;
-}
-
-void queue_reverse(Queue *queue) {
-    QueueNode *prev = NULL, *current = queue->front, *next = NULL;
-    queue->rear = queue->front;
-
-    while (current != NULL) {
-        next = current->next;
-        current->next = prev;
-        prev = current;
-        current = next;
+int queue_size(Queue *queue) {
+    if (queue == NULL) {
+        return -1;
     }
 
-    queue->front = prev;
+    return queue->size;
 }
