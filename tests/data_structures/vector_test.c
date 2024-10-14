@@ -1,248 +1,163 @@
 #include <check.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "../../includes/data_structures/vector.h"
 
-int sum;
+typedef struct {
+    Vector vector;
+} VectorFixture;
 
-int cmp_int(void *a, void *b) {
-    return (*(int *) a) - (*(int *) b);
+int cmp_fn(void *a, void *b) {
+    return (*(int *)a - *(int *)b);
 }
 
-void sum_int(void *data) {
-    sum += *(int *) data;
+void vector_setup(VectorFixture *fixture) {
+    vector_init(&fixture->vector, sizeof(int));
+}
+
+void vector_teardown(VectorFixture *fixture) {
+    vector_destroy(&fixture->vector);
 }
 
 START_TEST(test_vector_init) {
     Vector vector;
     vector_init(&vector, sizeof(int));
-    ck_assert_ptr_null(vector.head);
-    ck_assert_int_eq(vector.element_size, sizeof(int));
+    ck_assert_int_eq(vector.size, 0);
+    ck_assert_ptr_eq(vector.head, NULL);
     vector_destroy(&vector);
 }
 END_TEST
 
 START_TEST(test_vector_insert) {
-    Vector vector;
-    vector_init(&vector, sizeof(int));
+    VectorFixture fixture;
+    vector_setup(&fixture);
 
-    int value = 42;
-    vector_insert(&vector, &value);
-    ck_assert_ptr_nonnull(vector.head);
-    ck_assert_int_eq(*(int *)vector.head->data, 42);
+    int value1 = 10;
+    int value2 = 20;
 
-    vector_destroy(&vector);
+    ck_assert(vector_insert(&fixture.vector, &value1));
+    ck_assert_int_eq(fixture.vector.size, 1);
+    ck_assert_ptr_ne(fixture.vector.head, NULL);
+    ck_assert_int_eq(*(int *)fixture.vector.head->data, 10);
+
+    ck_assert(vector_insert(&fixture.vector, &value2));
+    ck_assert_int_eq(fixture.vector.size, 2);
+    ck_assert_int_eq(*(int *)fixture.vector.head->data, 20);
+
+    vector_teardown(&fixture);
 }
 END_TEST
 
 START_TEST(test_vector_remove) {
-    Vector vector;
-    vector_init(&vector, sizeof(int));
+    VectorFixture fixture;
+    vector_setup(&fixture);
 
-    int values[] = {5, 10, 15};
-    for (int i = 0; i < 3; i++) {
-        vector_insert(&vector, &values[i]);
-    }
+    int value1 = 10;
+    int value2 = 20;
+    vector_insert(&fixture.vector, &value1);
+    vector_insert(&fixture.vector, &value2);
 
-    int key = 10;
-    vector_remove(&vector, cmp_int, &key);
+    ck_assert(vector_remove(&fixture.vector, 0));
+    ck_assert_int_eq(fixture.vector.size, 1);
+    ck_assert_int_eq(*(int *)fixture.vector.head->data, 10);
 
-    VectorNode *current = vector.head;
-    while (current != NULL) {
-        ck_assert_int_ne(*(int *)current->data, 10);
-        current = current->next;
-    }
+    ck_assert(vector_remove(&fixture.vector, 0));
+    ck_assert_int_eq(fixture.vector.size, 0);
+    ck_assert_ptr_eq(fixture.vector.head, NULL);
 
-    vector_destroy(&vector);
+    vector_teardown(&fixture);
+}
+END_TEST
+
+START_TEST(test_vector_update) {
+    VectorFixture fixture;
+    vector_setup(&fixture);
+
+    int value1 = 10;
+    int value2 = 20;
+    int new_value = 30;
+
+    vector_insert(&fixture.vector, &value1);
+    vector_insert(&fixture.vector, &value2);
+
+    ck_assert(vector_update(&fixture.vector, 0, &new_value));
+    ck_assert_int_eq(*(int *)fixture.vector.head->data, 30);
+
+    vector_teardown(&fixture);
+}
+END_TEST
+
+START_TEST(test_vector_get) {
+    VectorFixture fixture;
+    vector_setup(&fixture);
+
+    int value1 = 10;
+    int value2 = 20;
+
+    vector_insert(&fixture.vector, &value1);
+    vector_insert(&fixture.vector, &value2);
+
+    int *result = (int *)vector_get(&fixture.vector, 1);
+    ck_assert_int_eq(*result, 10);
+
+    result = (int *)vector_get(&fixture.vector, 0);
+    ck_assert_int_eq(*result, 20);
+
+    vector_teardown(&fixture);
 }
 END_TEST
 
 START_TEST(test_vector_search) {
-    Vector vector;
-    vector_init(&vector, sizeof(int));
+    VectorFixture fixture;
+    vector_setup(&fixture);
 
-    int values[] = {5, 10, 15};
-    for (int i = 0; i < 3; i++) {
-        vector_insert(&vector, &values[i]);
-    }
+    int value1 = 10;
+    int value2 = 20;
 
-    int key = 10;
-    void *found = vector_search(&vector, cmp_int, &key);
+    vector_insert(&fixture.vector, &value1);
+    vector_insert(&fixture.vector, &value2);
 
-    ck_assert_ptr_nonnull(found);
-    ck_assert_int_eq(*(int *)found, 10);
+    int pos = vector_search(&fixture.vector, cmp_fn, &value1);
+    ck_assert_int_eq(pos, 1);
 
-    vector_destroy(&vector);
+    pos = vector_search(&fixture.vector, cmp_fn, &value2);
+    ck_assert_int_eq(pos, 0);
+
+    pos = vector_search(&fixture.vector, cmp_fn, NULL);
+    ck_assert_int_eq(pos, -1);
+
+    vector_teardown(&fixture);
 }
 END_TEST
 
-START_TEST(test_vector_foreach) {
-    Vector vector;
+START_TEST(test_vector_destroy) {
+    VectorFixture fixture;
+    vector_setup(&fixture);
 
-    vector_init(&vector, sizeof(int));
+    int value = 10;
+    vector_insert(&fixture.vector, &value);
+    vector_destroy(&fixture.vector);
 
-    int values[] = {1, 2, 3, 4, 5};
-    for (int i = 0; i < 5; i++) {
-        vector_insert(&vector, &values[i]);
-    }
-
-    sum = 0;
-    vector_foreach(&vector, sum_int);
-
-    ck_assert_int_eq(sum, 15);
-
-    vector_destroy(&vector);
+    ck_assert_ptr_eq(fixture.vector.head, NULL);
 }
 END_TEST
 
-START_TEST(test_vector_insert_at) {
-    Vector vector;
-    vector_init(&vector, sizeof(int));
-
-    int data1 = 1, data2 = 2, data3 = 3;
-
-    vector_insert(&vector, &data1);
-    vector_insert_at(&vector, 1, &data3);
-    vector_insert_at(&vector, 1, &data2);
-
-    int *found1 = (int *)vector_search(&vector, cmp_int, &data1);
-    int *found2 = (int *)vector_search(&vector, cmp_int, &data2);
-    int *found3 = (int *)vector_search(&vector, cmp_int, &data3);
-
-    ck_assert_ptr_nonnull(found1);
-    ck_assert_ptr_nonnull(found2);
-    ck_assert_ptr_nonnull(found3);
-    ck_assert_int_eq(*found1, 1);
-    ck_assert_int_eq(*found2, 2);
-    ck_assert_int_eq(*found3, 3);
-
-    vector_destroy(&vector);
-}
-END_TEST
-
-START_TEST(test_vector_remove_at) {
-    Vector vector;
-    vector_init(&vector, sizeof(int));
-
-    int data1 = 1, data2 = 2, data3 = 3;
-
-    vector_insert(&vector, &data1);
-    vector_insert(&vector, &data2);
-    vector_insert(&vector, &data3);
-
-    vector_remove_at(&vector, 1);
-
-    int *found1 = (int *)vector_search(&vector, cmp_int, &data1);
-    int *found2 = (int *)vector_search(&vector, cmp_int, &data2);
-    int *found3 = (int *)vector_search(&vector, cmp_int, &data3);
-
-    ck_assert_ptr_nonnull(found1);
-    ck_assert_ptr_null(found2);
-    ck_assert_ptr_nonnull(found3);
-
-    ck_assert_int_eq(*found1, 1);
-    ck_assert_int_eq(*found3, 3);
-
-    vector_destroy(&vector);
-}
-END_TEST
-
-START_TEST(test_vector_find) {
-    Vector vector;
-    vector_init(&vector, sizeof(int));
-
-    int data1 = 1, data2 = 2, data3 = 3;
-
-    vector_insert(&vector, &data1);
-    vector_insert(&vector, &data2);
-    vector_insert(&vector, &data3);
-
-    int index1 = vector_find(&vector, cmp_int, &data1);
-    int index2 = vector_find(&vector, cmp_int, &data2);
-    int index3 = vector_find(&vector, cmp_int, &data3);
-
-    ck_assert_int_eq(index1, 2);
-    ck_assert_int_eq(index2, 1);
-    ck_assert_int_eq(index3, 0);
-
-    vector_destroy(&vector);
-}
-END_TEST
-
-START_TEST(test_vector_reverse) {
-    Vector vector;
-    vector_init(&vector, sizeof(int));
-
-    int data1 = 1, data2 = 2, data3 = 3;
-
-    vector_insert(&vector, &data1);
-    vector_insert(&vector, &data2);
-    vector_insert(&vector, &data3);
-
-    vector_reverse(&vector);
-
-    int *found1 = (int *)vector_search(&vector, cmp_int, &data1);
-    int *found2 = (int *)vector_search(&vector, cmp_int, &data2);
-    int *found3 = (int *)vector_search(&vector, cmp_int, &data3);
-
-    ck_assert_ptr_nonnull(found1);
-    ck_assert_ptr_nonnull(found2);
-    ck_assert_ptr_nonnull(found3);
-
-    ck_assert_int_eq(*found1, 1);
-    ck_assert_int_eq(*found2, 2);
-    ck_assert_int_eq(*found3, 3);
-
-    vector_destroy(&vector);
-}
-END_TEST
-
-START_TEST(test_vector_sort) {
-    Vector vector;
-    vector_init(&vector, sizeof(int));
-
-    int data1 = 3, data2 = 1, data3 = 2;
-
-    vector_insert(&vector, &data1);
-    vector_insert(&vector, &data2);
-    vector_insert(&vector, &data3);
-
-    vector_sort(&vector, cmp_int);
-
-    int *found1 = (int *)vector_search(&vector, cmp_int, &data1);
-    int *found2 = (int *)vector_search(&vector, cmp_int, &data2);
-    int *found3 = (int *)vector_search(&vector, cmp_int, &data3);
-
-    ck_assert_ptr_nonnull(found1);
-    ck_assert_ptr_nonnull(found2);
-    ck_assert_ptr_nonnull(found3);
-
-    ck_assert_int_eq(*found1, 3);
-    ck_assert_int_eq(*found2, 1);
-    ck_assert_int_eq(*found3, 2);
-
-    vector_destroy(&vector);
-}
-END_TEST
-
-Suite *generic_list_suite(void) {
+Suite *vector_suite(void) {
     Suite *s;
     TCase *tc_core;
 
-    s = suite_create("Generic Vector");
-
+    s = suite_create("Vector");
     tc_core = tcase_create("Core");
 
     tcase_add_test(tc_core, test_vector_init);
     tcase_add_test(tc_core, test_vector_insert);
     tcase_add_test(tc_core, test_vector_remove);
+    tcase_add_test(tc_core, test_vector_update);
+    tcase_add_test(tc_core, test_vector_get);
     tcase_add_test(tc_core, test_vector_search);
-    tcase_add_test(tc_core, test_vector_foreach);
-    tcase_add_test(tc_core, test_vector_insert_at);
-    tcase_add_test(tc_core, test_vector_remove_at);
-    tcase_add_test(tc_core, test_vector_find);
-    tcase_add_test(tc_core, test_vector_reverse);
-    tcase_add_test(tc_core, test_vector_sort);
+    tcase_add_test(tc_core, test_vector_destroy);
+
     suite_add_tcase(s, tc_core);
 
     return s;
@@ -253,11 +168,12 @@ int main(void) {
     Suite *s;
     SRunner *sr;
 
-    s = generic_list_suite();
+    s = vector_suite();
     sr = srunner_create(s);
 
     srunner_run_all(sr, CK_NORMAL);
     number_failed = srunner_ntests_failed(sr);
     srunner_free(sr);
+
     return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

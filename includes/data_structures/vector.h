@@ -2,6 +2,7 @@
 #define VECTOR_H_
 
 #include <stddef.h>
+#include <stdbool.h>
 
 typedef struct VectorNode {
     void *data;
@@ -16,14 +17,12 @@ typedef struct Vector {
 
 void vector_init(Vector *vector, size_t element_size);
 void vector_destroy(Vector *vector);
-void vector_insert(Vector *vector, void *data);
-void vector_remove(Vector *vector, int (*cmp_fn)(void *, void *), void *key);
-void *vector_search(Vector *vector, int (*cmp_fn)(void *, void *), void *key);
-void vector_foreach(Vector *vector, void (*fn)(void *));
-void vector_insert_at(Vector *vector, size_t index, void *data);
-void vector_remove_at(Vector *vector, size_t index);
-int vector_find(Vector *vector, int (*cmp_fn)(void *, void *), void *key);
-void vector_reverse(Vector *vector);
-void vector_sort(Vector *vector, int (*cmp_fn)(void *, void *));
+bool vector_insert(Vector *vector, void *data);
+bool vector_remove(Vector *vector, size_t index);
+bool vector_update(Vector *vector, size_t index, void *new_data);
+void *vector_get(Vector *vector, size_t index);
+int vector_search(Vector *vector, int (*cmp_fn)(void *, void *), void *key);
+int vector_size(Vector *vector);
+bool vector_sort(Vector *vector, int (*cmp_fn)(void *, void *));
 
 #endif // VECTOR_H_

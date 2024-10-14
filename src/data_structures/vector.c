@@ -5,9 +5,21 @@
 #include "../../includes/data_structures/vector.h"
 
 static VectorNode *create_vector_node(void *data, size_t element_size) {
+    if (data == NULL || element_size == 0) {
+        return NULL;
+    }
+
     VectorNode *node = (VectorNode *) malloc(sizeof(VectorNode));
+    if (node == NULL) {
+        return NULL;
+    }
 
     node->data = malloc(element_size);
+    if (node->data == NULL) {
+        free(node);
+        return NULL;
+    }
+
     memcpy(node->data, data, element_size);
     node->next = NULL;
 
@@ -15,13 +27,20 @@ static VectorNode *create_vector_node(void *data, size_t element_size) {
 }
 
 void vector_init(Vector *vector, size_t element_size) {
+    if (vector == NULL || element_size == 0) {
+        return;
+    }
+
     vector->head = NULL;
     vector->element_size = element_size;
     vector->size = 0;
 }
 
-
 void vector_destroy(Vector *vector) {
+    if (vector == NULL) {
+        return;
+    }
+
     VectorNode *current = vector->head;
     VectorNode *next;
 
@@ -37,130 +56,119 @@ void vector_destroy(Vector *vector) {
     vector->head = NULL;
 }
 
-void vector_insert(Vector *vector, void *data) {
+bool vector_insert(Vector *vector, void *data) {
+    if (vector == NULL || data == NULL) {
+        return false;
+    }
+
     VectorNode *new_node = create_vector_node(data, vector->element_size);
+    if (new_node == NULL) {
+        return false;
+    }
+
     new_node->next = vector->head;
     vector->head = new_node;
     vector->size++;
+
+    return true;
 }
 
-void vector_remove(Vector *vector, int (*cmp_fn)(void *, void *), void *key) {
-    VectorNode *current = vector->head;
-    VectorNode *previous = NULL;
-
-    while (current != NULL) {
-        if (cmp_fn(current->data, key) == 0) {
-            if (previous == NULL) {
-                vector->head = current->next;
-            } else {
-                previous->next = current->next;
-            }
-
-            free(current->data);
-            free(current);
-            vector->size--;
-            return;
-        }
-
-        previous = current;
-        current = current->next;
+bool vector_remove(Vector *vector, size_t index) {
+    if (vector == NULL || index >= vector->size) {
+        return false;
     }
-}
-
-void *vector_search(Vector *vector, int (*cmp_fn)(void *, void *), void *key) {
-    VectorNode *current = vector->head;
-
-    while (current != NULL) {
-        if (cmp_fn(current->data, key) == 0) {
-            return current->data;
-        }
-
-        current = current->next;
-    }
-
-    return NULL;
-}
-
-void vector_foreach(Vector *vector, void (*fn)(void *)) {
-    VectorNode *current = vector->head;
-
-    while (current != NULL) {
-        fn(current->data);
-        current = current->next;
-    }
-}
-
-void vector_insert_at(Vector *vector, size_t index, void *data) {
-    if (index > vector->size) return;
-
-    VectorNode *new_node = create_vector_node(data, vector->element_size);
-
-    if (index == 0) {
-        new_node->next = vector->head;
-        vector->head = new_node;
-    } else {
-        VectorNode *current = vector->head;
-        for (size_t i = 0; i < index - 1 && current != NULL; i++) {
-            current = current->next;
-        }
-        new_node->next = current->next;
-        current->next = new_node;
-    }
-
-    vector->size++;
-}
-
-void vector_remove_at(Vector *vector, size_t index) {
-    if (index >= vector->size) return;
 
     VectorNode *current = vector->head;
     VectorNode *previous = NULL;
 
     if (index == 0) {
         vector->head = current->next;
+        free(current->data);
+        free(current);
     } else {
         for (size_t i = 0; i < index; i++) {
             previous = current;
             current = current->next;
         }
+
+        if (current == NULL) {
+            return false;
+        }
+
         previous->next = current->next;
+        free(current->data);
+        free(current);
     }
 
-    free(current->data);
-    free(current);
     vector->size--;
+    return true;
 }
 
-int vector_find(Vector *vector, int (*cmp_fn)(void *, void *), void *key) {
+bool vector_update(Vector *vector, size_t index, void *new_data) {
+    if (vector == NULL || new_data == NULL || index >= vector->size) {
+        return false;
+    }
+
     VectorNode *current = vector->head;
-    size_t index = 0;
+
+    for (size_t i = 0; i < index; i++) {
+        current = current->next;
+    }
+
+    if (current == NULL) {
+        return false;
+    }
+
+    memcpy(current->data, new_data, vector->element_size);
+    return true;
+}
+
+void *vector_get(Vector *vector, size_t index) {
+    if (vector == NULL || index >= vector->size) {
+        return NULL;
+    }
+
+    VectorNode *current = vector->head;
+
+    for (size_t i = 0; i < index; i++) {
+        current = current->next;
+    }
+
+    return current ? current->data : NULL;
+}
+
+int vector_search(Vector *vector, int (*cmp_fn)(void *, void *), void *key) {
+    if (vector == NULL || cmp_fn == NULL || key == NULL) {
+        return -1;
+    }
+
+    VectorNode *current = vector->head;
+    int position = 0;
+
     while (current != NULL) {
         if (cmp_fn(current->data, key) == 0) {
-            return index;
+            return position;
         }
+
         current = current->next;
-        index++;
+        position++;
     }
+
     return -1;
 }
 
-void vector_reverse(Vector *vector) {
-    VectorNode *prev = NULL;
-    VectorNode *current = vector->head;
-    VectorNode *next = NULL;
-
-    while (current != NULL) {
-        next = current->next;
-        current->next = prev;
-        prev = current;
-        current = next;
+int vector_size(Vector *vector) {
+    if (vector == NULL) {
+        return -1;
     }
 
-    vector->head = prev;
+    return vector->size;
 }
 
-void vector_sort(Vector *vector, int (*cmp_fn)(void *, void *)) {
-    if (vector->size < 2) return;
+bool vector_sort(Vector *vector, int (*cmp_fn)(void *, void *)) {
+    if (vector == NULL || cmp_fn == NULL || vector->size < 2) {
+        return false;
+    }
 
     for (VectorNode *i = vector->head; i != NULL; i = i->next) {
         for (VectorNode *j = i->next; j != NULL; j = j->next) {
@@ -171,4 +179,6 @@ void vector_sort(Vector *vector, int (*cmp_fn)(void *, void *)) {
             }
         }
     }
+
+    return true;
 }
