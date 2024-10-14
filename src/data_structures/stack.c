@@ -72,3 +72,26 @@ void stack_foreach(Stack *stack, void (*fn)(void *)) {
         current = current->next;
     }
 }
+
+size_t stack_size(Stack *stack) {
+    StackNode *current = stack->top;
+    size_t count = 0;
+    while (current != NULL) {
+        count++;
+        current = current->next;
+    }
+    return count;
+}
+
+void stack_reverse(Stack *stack) {
+    StackNode *prev = NULL;
+    StackNode *current = stack->top;
+    StackNode *next = NULL;
+    while (current != NULL) {
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    }
+    stack->top = prev;
+}

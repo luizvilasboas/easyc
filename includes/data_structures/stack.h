@@ -20,5 +20,7 @@ void stack_pop(Stack *stack, void *element);
 void *stack_peek(Stack *stack);
 void *stack_search(Stack *stack, int (*cmp_fn)(void *, void *), void *key);
 void stack_foreach(Stack *stack, void (*fn)(void *));
+size_t stack_size(Stack *stack);
+void stack_reverse(Stack *stack);
 
 #endif // STACK_H_

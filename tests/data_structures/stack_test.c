@@ -108,6 +108,50 @@ START_TEST(test_stack_foreach) {
 }
 END_TEST
 
+START_TEST(test_stack_size) {
+    Stack stack;
+    stack_init(&stack, sizeof(int));
+
+    int a = 1, b = 2, c = 3;
+
+    ck_assert_int_eq(stack_size(&stack), 0);
+
+    stack_push(&stack, &a);
+    stack_push(&stack, &b);
+    stack_push(&stack, &c);
+
+    ck_assert_int_eq(stack_size(&stack), 3);
+
+    stack_destroy(&stack);
+}
+END_TEST
+
+START_TEST(test_stack_reverse) {
+    Stack stack;
+    stack_init(&stack, sizeof(int));
+
+    int a = 1, b = 2, c = 3;
+
+    stack_push(&stack, &a);
+    stack_push(&stack, &b);
+    stack_push(&stack, &c);
+
+    stack_reverse(&stack);
+
+    int peeked;
+    stack_pop(&stack, &peeked);
+    ck_assert_int_eq(peeked, 1);
+
+    stack_pop(&stack, &peeked);
+    ck_assert_int_eq(peeked, 2);
+
+    stack_pop(&stack, &peeked);
+    ck_assert_int_eq(peeked, 3);
+
+    stack_destroy(&stack);
+}
+END_TEST
+
 Suite *generic_stack_suite(void) {
     Suite *s;
     TCase *tc_core;
@@ -122,6 +166,8 @@ Suite *generic_stack_suite(void) {
     tcase_add_test(tc_core, test_stack_peek);
     tcase_add_test(tc_core, test_stack_search);
     tcase_add_test(tc_core, test_stack_foreach);
+    tcase_add_test(tc_core, test_stack_size);
+    tcase_add_test(tc_core, test_stack_reverse);
     suite_add_tcase(s, tc_core);
 
     return s;

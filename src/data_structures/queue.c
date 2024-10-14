@@ -79,3 +79,34 @@ void queue_foreach(Queue *queue, void (*fn)(void *)) {
         current = current->next;
     }
 }
+
+size_t queue_size(Queue *queue) {
+    size_t size = 0;
+    QueueNode *current = queue->front;
+    while (current != NULL) {
+        size++;
+        current = current->next;
+    }
+    return size;
+}
+
+void *queue_peek(Queue *queue) {
+    if (queue->front != NULL) {
+        return queue->front->data;
+    }
+    return NULL;
+}
+
+void queue_reverse(Queue *queue) {
+    QueueNode *prev = NULL, *current = queue->front, *next = NULL;
+    queue->rear = queue->front;
+
+    while (current != NULL) {
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    }
+
+    queue->front = prev;
+}

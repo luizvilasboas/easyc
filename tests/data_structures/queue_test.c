@@ -104,6 +104,56 @@ START_TEST(test_queue_foreach) {
 }
 END_TEST
 
+START_TEST(test_queue_size) {
+    Queue queue;
+    queue_init(&queue, sizeof(int));
+
+    int a = 1, b = 2;
+    queue_enqueue(&queue, &a);
+    queue_enqueue(&queue, &b);
+
+    ck_assert_int_eq(queue_size(&queue), 2);
+
+    queue_destroy(&queue);
+}
+END_TEST
+
+START_TEST(test_queue_peek) {
+    Queue queue;
+    queue_init(&queue, sizeof(int));
+
+    int a = 1, b = 2;
+    queue_enqueue(&queue, &a);
+    queue_enqueue(&queue, &b);
+
+    int *peeked_int = (int *) queue_peek(&queue);
+    ck_assert_int_eq(*peeked_int, 1);
+
+    queue_destroy(&queue);
+}
+END_TEST
+
+START_TEST(test_queue_reverse) {
+    Queue queue;
+    queue_init(&queue, sizeof(int));
+
+    int a = 1, b = 2;
+    queue_enqueue(&queue, &a);
+    queue_enqueue(&queue, &b);
+
+    queue_reverse(&queue);
+
+    int dequeued_int;
+    queue_dequeue(&queue, &dequeued_int);
+    ck_assert_int_eq(dequeued_int, 2);
+
+    queue_dequeue(&queue, &dequeued_int);
+    ck_assert_int_eq(dequeued_int, 1);
+
+    queue_destroy(&queue);
+}
+END_TEST
+
 Suite *generic_queue_suite(void) {
     Suite *s;
     TCase *tc_core;
@@ -117,6 +167,9 @@ Suite *generic_queue_suite(void) {
     tcase_add_test(tc_core, test_queue_dequeue);
     tcase_add_test(tc_core, test_queue_search);
     tcase_add_test(tc_core, test_queue_foreach);
+    tcase_add_test(tc_core, test_queue_size);
+    tcase_add_test(tc_core, test_queue_reverse);
+    tcase_add_test(tc_core, test_queue_peek);
     suite_add_tcase(s, tc_core);
 
     return s;
