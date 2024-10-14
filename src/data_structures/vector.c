@@ -54,6 +54,8 @@ void vector_destroy(Vector *vector) {
     }
 
     vector->head = NULL;
+    vector->size = 0;
+    vector->element_size = 0;
 }
 
 bool vector_insert(Vector *vector, void *data) {
