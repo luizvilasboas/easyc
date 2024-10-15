@@ -4,94 +4,123 @@
 
 #include "../../includes/data_structures/stack.h"
 
+static StackNode *create_queue_node(void *data, size_t element_size) {
+    if (data == NULL || element_size == 0) {
+        return NULL;
+    }
+
+    StackNode *node = (StackNode *) malloc(sizeof(StackNode));
+    if (node == NULL) {
+        return NULL;
+    }
+
+    node->data = malloc(element_size);
+    if (node->data == NULL) {
+        free(node);
+        return NULL;
+    }
+
+    memcpy(node->data, data, element_size);
+    node->next = NULL;
+
+    return node;
+}
+
 void stack_init(Stack *stack, size_t element_size) {
+    if (stack == NULL || element_size == 0) {
+        return;
+    }
+
     stack->top = NULL;
     stack->element_size = element_size;
+    stack->size = 0;
 }
 
 void stack_destroy(Stack *stack) {
-    while (stack->top != NULL) {
-        StackNode *node = stack->top;
-        stack->top = node->next;
-
-        free(node->data);
-        free(node);
+    if (stack == NULL) {
+        return;
     }
+
+    StackNode *current = stack->top;
+    StackNode *next;
+
+    while (current != NULL) {
+        next = current->next;
+
+        free(current->data);
+        free(current);
+
+        current = next;
+    }
+
+    stack->top = NULL;
+    stack->size = 0;
+    stack->element_size = 0;
 }
 
-void stack_push(Stack *stack, void *element) {
-    StackNode *new_node = (StackNode *) malloc(sizeof(StackNode));
-    assert(new_node != NULL);
+bool stack_push(Stack *stack, void *data) {
+    if (stack == NULL || data == NULL) {
+        return false;
+    }
 
-    new_node->data = malloc(stack->element_size);
-    assert(new_node->data != NULL);
-    memcpy(new_node->data, element, stack->element_size);
+    StackNode *new_node = create_queue_node(data, stack->element_size);
+    if (new_node == NULL) {
+        return false;
+    }
 
     new_node->next = stack->top;
     stack->top = new_node;
+    stack->size++;
+    return true;
 }
 
-void stack_pop(Stack *stack, void *element) {
-    assert(stack->top != NULL);
+
+bool stack_pop(Stack *stack) {
+    if (stack == NULL || stack->top == NULL) {
+        return false;
+    }
 
     StackNode *top_node = stack->top;
-    memcpy(element, top_node->data, stack->element_size);
 
     stack->top = top_node->next;
     free(top_node->data);
     free(top_node);
+    stack->size--;
+    return true;
 }
 
-void *stack_peek(Stack *stack) {
-    if (stack->top == NULL) {
+void *stack_top(Stack *stack) {
+    if (stack == NULL) {
         return NULL;
     }
 
     return stack->top->data;
 }
 
-void *stack_search(Stack *stack, int (*cmp_fn)(void *, void *), void *key) {
+int stack_search(Stack *stack, int (*cmp_fn)(void *, void *), void *key) {
+    if (stack == NULL || cmp_fn == NULL || key == NULL) {
+        return -1;
+    }
+
     StackNode *current = stack->top;
+    int position = 0;
 
     while (current != NULL) {
         if (cmp_fn(current->data, key) == 0) {
-            return current->data;
+            return position;
         }
 
         current = current->next;
+        position++;
     }
 
-    return NULL;
+    return -1;
 }
 
-void stack_foreach(Stack *stack, void (*fn)(void *)) {
-    StackNode *current = stack->top;
-
-    while (current != NULL) {
-        fn(current->data);
-        current = current->next;
+int stack_size(Stack *stack) {
+    if (stack == NULL) {
+        return -1;
     }
-}
 
-size_t stack_size(Stack *stack) {
-    StackNode *current = stack->top;
-    size_t count = 0;
-    while (current != NULL) {
-        count++;
-        current = current->next;
-    }
-    return count;
-}
-
-void stack_reverse(Stack *stack) {
-    StackNode *prev = NULL;
-    StackNode *current = stack->top;
-    StackNode *next = NULL;
-    while (current != NULL) {
-        next = current->next;
-        current->next = prev;
-        prev = current;
-        current = next;
-    }
-    stack->top = prev;
+    return stack->size;
 }

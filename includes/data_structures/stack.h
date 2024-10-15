@@ -2,6 +2,7 @@
 #define STACK_H_
 
 #include <stddef.h>
+#include <stdbool.h>
 
 typedef struct StackNode {
     void *data;
@@ -11,16 +12,15 @@ typedef struct StackNode {
 typedef struct {
     StackNode *top;
     size_t element_size;
+    size_t size;
 } Stack;
 
 void stack_init(Stack *stack, size_t element_size);
 void stack_destroy(Stack *stack);
-void stack_push(Stack *stack, void *element);
-void stack_pop(Stack *stack, void *element);
-void *stack_peek(Stack *stack);
-void *stack_search(Stack *stack, int (*cmp_fn)(void *, void *), void *key);
-void stack_foreach(Stack *stack, void (*fn)(void *));
-size_t stack_size(Stack *stack);
-void stack_reverse(Stack *stack);
+bool stack_push(Stack *stack, void *data);
+bool stack_pop(Stack *stack);
+void *stack_top(Stack *stack);
+int stack_search(Stack *stack, int (*cmp_fn)(void *, void *), void *key);
+int stack_size(Stack *stack);
 
 #endif // STACK_H_
