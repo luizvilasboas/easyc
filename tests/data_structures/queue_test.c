@@ -14,7 +14,7 @@ START_TEST(test_queue_init) {
 
     ck_assert_int_eq(queue.size, 0);
     ck_assert_ptr_eq(queue.front, NULL);
-    ck_assert_ptr_eq(queue.rear, NULL);
+    ck_assert_ptr_eq(queue.back, NULL);
 
     queue_destroy(&queue);
 }
@@ -29,7 +29,7 @@ START_TEST(test_queue_push) {
     ck_assert_int_eq(queue_push(&queue, &a), 1);
     ck_assert_int_eq(queue.size, 1);
     ck_assert_ptr_ne(queue.front, NULL);
-    ck_assert_ptr_ne(queue.rear, NULL);
+    ck_assert_ptr_ne(queue.back, NULL);
 
     int *data = (int *) queue.front->data;
     ck_assert_int_eq(*data, 1);
@@ -37,7 +37,7 @@ START_TEST(test_queue_push) {
     ck_assert_int_eq(queue_push(&queue, &b), 1);
     ck_assert_int_eq(queue.size, 2);
 
-    data = (int *) queue.rear->data;
+    data = (int *) queue.back->data;
     ck_assert_int_eq(*data, 2);
 
     queue_destroy(&queue);
@@ -60,7 +60,7 @@ START_TEST(test_queue_pop) {
     ck_assert_int_eq(queue_pop(&queue), 1);
     ck_assert_int_eq(queue.size, 0);
     ck_assert_ptr_eq(queue.front, NULL);
-    ck_assert_ptr_eq(queue.rear, NULL);
+    ck_assert_ptr_eq(queue.back, NULL);
 
     queue_destroy(&queue);
 }
@@ -95,7 +95,7 @@ START_TEST(test_queue_destroy) {
     queue_destroy(&queue);
     ck_assert_int_eq(queue.size, 0);
     ck_assert_ptr_eq(queue.front, NULL);
-    ck_assert_ptr_eq(queue.rear, NULL);
+    ck_assert_ptr_eq(queue.back, NULL);
     ck_assert_int_eq(queue.element_size, 0);
 
     queue_destroy(&queue);

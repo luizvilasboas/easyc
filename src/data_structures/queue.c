@@ -32,7 +32,7 @@ void queue_init(Queue *queue, size_t element_size) {
     }
 
     queue->front = NULL;
-    queue->rear = NULL;
+    queue->back = NULL;
     queue->element_size = element_size;
     queue->size = 0;
 }
@@ -54,7 +54,7 @@ void queue_destroy(Queue *queue) {
     }
 
     queue->front = NULL;
-    queue->rear = NULL;
+    queue->back = NULL;
     queue->size = 0;
     queue->element_size = 0;
 }
@@ -71,10 +71,10 @@ bool queue_push(Queue *queue, void *data) {
 
     if (queue->size == 0) {
         queue->front = new_node;
-        queue->rear = new_node;
+        queue->back = new_node;
     } else {
-        queue->rear->next = new_node;
-        queue->rear = new_node;
+        queue->back->next = new_node;
+        queue->back = new_node;
     }
 
     queue->size++;
@@ -90,13 +90,29 @@ bool queue_pop(Queue *queue) {
     queue->front = queue->front->next;
 
     if (queue->front == NULL) {
-        queue->rear = NULL;
+        queue->back = NULL;
     }
 
     free(temp->data);
     free(temp);
     queue->size--;
     return true;
+}
+
+void *queue_front(Queue *queue) {
+    if (queue == NULL) {
+        return NULL;
+    }
+
+    return queue->front->data;
+}
+
+void *queue_back(Queue *queue) {
+    if (queue == NULL) {
+        return NULL;
+    }
+
+    return queue->back->data;
 }
 
 int queue_search(Queue *queue, int (*cmp_fn)(void *, void *), void *key) {

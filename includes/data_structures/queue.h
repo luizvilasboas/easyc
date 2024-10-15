@@ -11,7 +11,7 @@ typedef struct QueueNode {
 
 typedef struct {
     QueueNode *front;
-    QueueNode *rear;
+    QueueNode *back;
     size_t element_size;
     size_t size;
 } Queue;
