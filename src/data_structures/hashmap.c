@@ -1,16 +1,25 @@
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
 #include "../../includes/data_structures/hashmap.h"
 
 static HashNode *create_node(size_t key_size, size_t value_size, void *key, void *value) {
+    if (key == NULL || value == NULL || key_size == 0 || value_size == 0) {
+        return NULL;
+    }
+
     HashNode *new_node = (HashNode *)malloc(sizeof(HashNode));
-    assert(new_node != NULL);
+    if (new_node == NULL) {
+        return NULL;
+    }
 
     new_node->key = malloc(key_size);
     new_node->value = malloc(value_size);
-    assert(new_node->key != NULL && new_node->value != NULL);
+    if (new_node->key == NULL || new_node->value == NULL) {
+        free(new_node);
+        return NULL;
+    }
 
     memcpy(new_node->key, key, key_size);
     memcpy(new_node->value, value, value_size);
@@ -20,17 +29,28 @@ static HashNode *create_node(size_t key_size, size_t value_size, void *key, void
 }
 
 void hashmap_init(HashMap *map, size_t bucket_count, size_t key_size, size_t value_size, unsigned long (*hash_fn)(void *), int (*cmp_fn)(void *, void *)) {
+    if (map == NULL || bucket_count == 0 || key_size == 0 || value_size == 0 || hash_fn == NULL || cmp_fn == NULL) {
+        return;
+    }
+
     map->buckets = (HashNode **)calloc(bucket_count, sizeof(HashNode *));
-    assert(map->buckets != NULL);
+    if (map->buckets == NULL) {
+        return;
+    }
 
     map->bucket_count = bucket_count;
     map->key_size = key_size;
     map->value_size = value_size;
     map->hash_fn = hash_fn;
     map->cmp_fn = cmp_fn;
+    map->size = 0;
 }
 
 void hashmap_destroy(HashMap *map) {
+    if (map == NULL) {
+        return;
+    }
+
     for (size_t i = 0; i < map->bucket_count; i++) {
         HashNode *node = map->buckets[i];
 
@@ -45,44 +65,48 @@ void hashmap_destroy(HashMap *map) {
     }
 
     free(map->buckets);
+    map->buckets = NULL;
+    map->bucket_count = 0;
+    map->size = 0;
 }
 
-void hashmap_insert(HashMap *map, void *key, void *value) {
-    unsigned long hash_value = map->hash_fn(key) % map->bucket_count;
+bool hashmap_insert(HashMap *map, void *key, void *value) {
+    if (map == NULL || key == NULL || value == NULL) {
+        return false;
+    }
 
+    unsigned long hash_value = map->hash_fn(key) % map->bucket_count;
     HashNode *current = map->buckets[hash_value];
+
     while (current != NULL) {
         if (map->cmp_fn(current->key, key) == 0) {
             memcpy(current->value, value, map->value_size);
-            return;
+            return true;
         }
 
         current = current->next;
     }
 
     HashNode *new_node = create_node(map->key_size, map->value_size, key, value);
+    if (new_node == NULL) {
+        return false;
+    }
+
     new_node->next = map->buckets[hash_value];
     map->buckets[hash_value] = new_node;
+    map->size++;
+    return true;
 }
 
-void *hashmap_search(HashMap *map, void *key) {
-    unsigned long hash_value = map->hash_fn(key) % map->bucket_count;
-
-    HashNode *current = map->buckets[hash_value];
-    while (current != NULL) {
-        if (map->cmp_fn(current->key, key) == 0) {
-            return current->value;
-        }
-        current = current->next;
+bool hashmap_remove(HashMap *map, void *key) {
+    if (map == NULL || key == NULL) {
+        return false;
     }
-    return NULL;
-}
 
-void hashmap_remove(HashMap *map, void *key) {
     unsigned long hash_value = map->hash_fn(key) % map->bucket_count;
-
     HashNode *current = map->buckets[hash_value];
     HashNode *prev = NULL;
+
     while (current != NULL) {
         if (map->cmp_fn(current->key, key) == 0) {
             if (prev == NULL) {
@@ -94,20 +118,57 @@ void hashmap_remove(HashMap *map, void *key) {
             free(current->key);
             free(current->value);
             free(current);
-            return;
+            map->size--;
+            return true;
         }
         prev = current;
         current = current->next;
     }
+
+    return false;
 }
 
-void hashmap_foreach(HashMap *map, void (*func)(void *, void *)) {
-    for (size_t i = 0; i < map->bucket_count; i++) {
-        HashNode *current = map->buckets[i];
-
-        while (current != NULL) {
-            func(current->key, current->value);
-            current = current->next;
-        }
+bool hashmap_update(HashMap *map, void *key, void *new_value) {
+    if (map == NULL || key == NULL || new_value == NULL) {
+        return false;
     }
+
+    unsigned long hash_value = map->hash_fn(key) % map->bucket_count;
+    HashNode *current = map->buckets[hash_value];
+
+    while (current != NULL) {
+        if (map->cmp_fn(current->key, key) == 0) {
+            memcpy(current->value, new_value, map->value_size);
+            return true;
+        }
+        current = current->next;
+    }
+
+    return false;
+}
+
+void *hashmap_get(HashMap *map, void *key) {
+    if (map == NULL || key == NULL) {
+        return NULL;
+    }
+
+    unsigned long hash_value = map->hash_fn(key) % map->bucket_count;
+    HashNode *current = map->buckets[hash_value];
+
+    while (current != NULL) {
+        if (map->cmp_fn(current->key, key) == 0) {
+            return current->value;
+        }
+        current = current->next;
+    }
+
+    return NULL;
+}
+
+int hashmap_size(HashMap *map) {
+    if (map == NULL) {
+        return -1;
+    }
+
+    return map->size;
 }

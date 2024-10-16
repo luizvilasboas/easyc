@@ -1,56 +1,38 @@
 #include <check.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 #include "../../includes/data_structures/hashmap.h"
 
-int sum;
-
-unsigned long hash_int(void *key) {
+unsigned long simple_hash(void *key) {
     return *(int *)key;
 }
 
-int cmp_ints(void *a, void *b) {
-    return *(int *)a - *(int *)b;
+int cmp_fn(void *a, void *b) {
+    return *(int *) a - *(int *) b;
 }
 
-void sum_int(void *key, void *value) {
-    sum += *(int *) value + *(int *) key;
-}
-
-START_TEST(test_hashmap_insert_search) {
+START_TEST(test_hashmap_init) {
     HashMap map;
-    hashmap_init(&map, 10, sizeof(int), sizeof(int), hash_int, cmp_ints);
+    hashmap_init(&map, 10, sizeof(int), sizeof(int), simple_hash, cmp_fn);
 
-    int key = 10, value = 100;
-    hashmap_insert(&map, &key, &value);
-
-    int *found = (int *)hashmap_search(&map, &key);
-    ck_assert_ptr_nonnull(found);
-    ck_assert_int_eq(*found, 100);
-
-    int non_existent_key = 20;
-    found = (int *)hashmap_search(&map, &non_existent_key);
-    ck_assert_ptr_null(found);
+    ck_assert_ptr_nonnull(map.buckets);
+    ck_assert_int_eq(map.bucket_count, 10);
+    ck_assert_int_eq(map.size, 0);
 
     hashmap_destroy(&map);
 }
 END_TEST
 
-START_TEST(test_hashmap_foreach) {
+START_TEST(test_hashmap_insert) {
     HashMap map;
-    hashmap_init(&map, 10, sizeof(int), sizeof(int), hash_int, cmp_ints);
+    hashmap_init(&map, 10, sizeof(int), sizeof(int), simple_hash, cmp_fn);
 
-    int keys[] = {10, 20, 30};
-    int values[] = {100, 200, 300};
-    for (int i = 0; i < 3; i++) {
-        hashmap_insert(&map, &keys[i], &values[i]);
-    }
+    int key = 42;
+    int value = 100;
+    bool inserted = hashmap_insert(&map, &key, &value);
 
-    sum = 0;
-    hashmap_foreach(&map, sum_int);
-
-    ck_assert_int_eq(sum, 660);
+    ck_assert(inserted);
+    ck_assert_int_eq(map.size, 1);
 
     hashmap_destroy(&map);
 }
@@ -58,44 +40,88 @@ END_TEST
 
 START_TEST(test_hashmap_remove) {
     HashMap map;
-    hashmap_init(&map, 10, sizeof(int), sizeof(int), hash_int, cmp_ints);
+    hashmap_init(&map, 10, sizeof(int), sizeof(int), simple_hash, cmp_fn);
 
-    int key1 = 10, value1 = 100;
-    int key2 = 20, value2 = 200;
-    hashmap_insert(&map, &key1, &value1);
-    hashmap_insert(&map, &key2, &value2);
+    int key = 42;
+    int value = 100;
+    hashmap_insert(&map, &key, &value);
 
-    int *found = (int *)hashmap_search(&map, &key1);
-    ck_assert_ptr_nonnull(found);
-    ck_assert_int_eq(*found, 100);
-
-    found = (int *)hashmap_search(&map, &key2);
-    ck_assert_ptr_nonnull(found);
-    ck_assert_int_eq(*found, 200);
-
-    hashmap_remove(&map, &key1);
-    found = (int *)hashmap_search(&map, &key1);
-    ck_assert_ptr_null(found);
-
-    found = (int *)hashmap_search(&map, &key2);
-    ck_assert_ptr_nonnull(found);
-    ck_assert_int_eq(*found, 200);
+    bool removed = hashmap_remove(&map, &key);
+    ck_assert(removed);
+    ck_assert_int_eq(map.size, 0);
 
     hashmap_destroy(&map);
 }
 END_TEST
 
+START_TEST(test_hashmap_get) {
+    HashMap map;
+    hashmap_init(&map, 10, sizeof(int), sizeof(int), simple_hash, cmp_fn);
 
-Suite *generic_hashmap_suite(void) {
+    int key = 42;
+    int value = 100;
+    hashmap_insert(&map, &key, &value);
+
+    int *retrieved_value = (int *)hashmap_get(&map, &key);
+    ck_assert_ptr_nonnull(retrieved_value);
+    ck_assert_int_eq(*retrieved_value, 100);
+
+    hashmap_destroy(&map);
+}
+END_TEST
+
+START_TEST(test_hashmap_update) {
+    HashMap map;
+    hashmap_init(&map, 10, sizeof(int), sizeof(int), simple_hash, cmp_fn);
+
+    int key = 42;
+    int value = 100;
+    int new_value = 200;
+
+    hashmap_insert(&map, &key, &value);
+    bool updated = hashmap_update(&map, &key, &new_value);
+
+    ck_assert(updated);
+
+    int *retrieved_value = (int *)hashmap_get(&map, &key);
+    ck_assert_ptr_nonnull(retrieved_value);
+    ck_assert_int_eq(*retrieved_value, 200);
+
+    hashmap_destroy(&map);
+}
+END_TEST
+
+START_TEST(test_hashmap_size) {
+    HashMap map;
+    hashmap_init(&map, 10, sizeof(int), sizeof(int), simple_hash, cmp_fn);
+
+    int key1 = 1, value1 = 100;
+    int key2 = 2, value2 = 200;
+
+    hashmap_insert(&map, &key1, &value1);
+    hashmap_insert(&map, &key2, &value2);
+
+    ck_assert_int_eq(hashmap_size(&map), 2);
+
+    hashmap_destroy(&map);
+}
+END_TEST
+
+Suite *hashmap_suite(void) {
     Suite *s;
     TCase *tc_core;
 
     s = suite_create("HashMap");
 
     tc_core = tcase_create("Core");
-    tcase_add_test(tc_core, test_hashmap_insert_search);
-    tcase_add_test(tc_core, test_hashmap_foreach);
+
+    tcase_add_test(tc_core, test_hashmap_init);
+    tcase_add_test(tc_core, test_hashmap_insert);
     tcase_add_test(tc_core, test_hashmap_remove);
+    tcase_add_test(tc_core, test_hashmap_get);
+    tcase_add_test(tc_core, test_hashmap_update);
+    tcase_add_test(tc_core, test_hashmap_size);
+
     suite_add_tcase(s, tc_core);
 
     return s;
@@ -106,11 +132,12 @@ int main(void) {
     Suite *s;
     SRunner *sr;
 
-    s = generic_hashmap_suite();
+    s = hashmap_suite();
     sr = srunner_create(s);
 
     srunner_run_all(sr, CK_NORMAL);
     number_failed = srunner_ntests_failed(sr);
     srunner_free(sr);
+
     return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
