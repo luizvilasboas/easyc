@@ -6,7 +6,7 @@ SRC_DIR = src
 INCLUDE_DIR = includes
 TEST_DIR = tests
 BIN_DIR = bin
-LIB_DIR = libls
+LIB_DIR = lib
 
 SRC_SUBDIRS = $(shell find $(SRC_DIR) -type d)
 INCLUDE_SUBDIRS = $(shell find $(INCLUDE_DIR) -type d)
