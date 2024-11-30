@@ -3,6 +3,10 @@ stages:
   - test
   - deploy
 
+variables:
+  DOCKER_IMAGE_NAME: "olooeez/$CI_PROJECT_NAME"
+  DOCKER_IMAGE_TAG: "$CI_COMMIT_TAG"
+
 before_script:
   - apt-get update && apt-get install -y make check valgrind
 
