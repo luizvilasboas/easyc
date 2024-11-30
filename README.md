@@ -82,7 +82,7 @@ The tests will run automatically, and the results will be displayed in the termi
 
 ## Usage
 
-Include the necessary headers in your project and compile using the library paths:
+Include the necessary headers in your project and compile using the library paths. Checkout the [docs](https://gitlab.com/olooeez/easyc/-/tree/main/docs) for more information:
 
 ```c
 #include <easyc/base_string.h>
