@@ -1,0 +1,37 @@
+stages:
+  - build
+  - test
+  - deploy
+
+before_script:
+  - apt-get update && apt-get install -y make check valgrind
+
+build:
+  stage: build
+  tags:
+    - clang
+  script:
+    - make all
+
+test:
+  stage: test
+  tags:
+    - clang
+  dependencies:
+    - build
+  script:
+    - make test
+
+deploy:
+  stage: deploy
+  only:
+    - tags
+  script:
+    - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
+    - docker build -t "$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG" .
+    - docker push "$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG"
+    - docker tag "$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG" "$DOCKER_IMAGE_NAME:latest"
+    - docker push "$DOCKER_IMAGE_NAME:latest"
+  tags:
+    - docker
+
