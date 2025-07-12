@@ -56,7 +56,7 @@ easyc is a C library designed to simplify working with data structures and strin
 
 1. Clone this repository:
    ```
-   git clone https://gitlab.com/olooeez/easyc.git
+   git clone https://github.com/luizvilasboas/easyc.git
    cd easyc
    ```
 
@@ -82,7 +82,7 @@ The tests will run automatically, and the results will be displayed in the termi
 
 ## Usage
 
-Include the necessary headers in your project and compile using the library paths. Checkout the [docs](https://gitlab.com/olooeez/easyc/-/tree/main/docs) for more information:
+Include the necessary headers in your project and compile using the library paths. Checkout the [docs](https://github.com/luizvilasboas/easyc/tree/main/docs) for more information:
 
 ```c
 #include <easyc/base_string.h>
@@ -103,4 +103,4 @@ gcc -o my_program my_program.c -I/usr/local/include/easyc -L/usr/local/lib/easyc
 
 ## License
 
-This project is licensed under the [MIT License](https://gitlab.com/olooeez/easyc/-/blob/main/LICENSE).
+This project is licensed under the [MIT License](https://github.com/luizvilasboas/easyc/blob/main/LICENSE).
