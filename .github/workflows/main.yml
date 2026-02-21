@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags:
-      - '*'
+      - "*"
   pull_request:
 
 jobs:
@@ -20,6 +20,8 @@ jobs:
         run: make all
       - name: Test
         run: make test
+      - name: Check leaks
+        run: make leak
 
   deploy:
     if: startsWith(github.ref, 'refs/tags/')

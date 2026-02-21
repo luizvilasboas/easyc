@@ -47,7 +47,6 @@ $(STATIC_LIB): $(OBJ)
 	ar rcs $@ $^
 
 install: all
-	@echo "Instalando bibliotecas em $(LIB_INSTALL_DIR) e headers em $(INCLUDE_INSTALL_DIR)"
 	mkdir -p $(INCLUDE_INSTALL_DIR)
 	mkdir -p $(LIB_INSTALL_DIR)
 	@for dir in $(INCLUDE_SUBDIRS); do \
@@ -58,7 +57,6 @@ install: all
 	cp $(SHARED_LIB) $(STATIC_LIB) $(LIB_INSTALL_DIR)
 
 uninstall:
-	@echo "Removendo bibliotecas e headers instalados"
 	rm -f $(LIB_INSTALL_DIR)/lib$(LIB_NAME).so
 	rm -f $(LIB_INSTALL_DIR)/lib$(LIB_NAME).a
 	@for dir in $(INCLUDE_SUBDIRS); do \
@@ -68,11 +66,19 @@ uninstall:
 
 test: $(TEST_BINARIES)
 	@for test_bin in $(TEST_BINARIES); do \
-		echo "Executando $$test_bin..."; \
 		./$$test_bin; \
+	done
+
+leak: $(TEST_BINARIES)
+	@for test_bin in $(TEST_BINARIES); do \
+		valgrind --leak-check=full \
+		    --show-leak-kinds=all \
+			--track-origins=yes \
+			--error-exitcode=1 \
+			$$test_bin; \
 	done
 
 clean:
 	rm -rf $(BIN_DIR) $(LIB_DIR)
 
-.PHONY: all install uninstall test clean
+.PHONY: all install uninstall test clean leak
