@@ -19,7 +19,7 @@ TEST_BINARIES = $(patsubst $(TEST_DIR)/%.c,  	$(BIN_DIR)/%, $(TEST_SRC))
 
 ALL_SOURCE_FILES = $(shell find $(SRC_DIR) $(TEST_DIR) $(INCLUDE_DIR) -name "*.c" -o -name "*.h")
 
-LIB_NAME = easyc
+LIB_NAME = libstd
 SHARED_LIB = $(LIB_DIR)/lib$(LIB_NAME).so
 STATIC_LIB = $(LIB_DIR)/lib$(LIB_NAME).a
 

@@ -38,7 +38,7 @@ The `queue` module implements a generic First-In-First-Out (FIFO) queue with dyn
 #### Example usage
 
 ```c
-#include <easyc/data_structures/queue.h>
+#include <libstd/data_structures/queue.h>
 #include <stdio.h>
 
 int main() {

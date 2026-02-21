@@ -40,13 +40,13 @@ The `base_string` module provides a custom string type with advanced manipulatio
    Replaces occurrences of a substring with another substring.  
    **Usage:**
    ```c
-   string_replace(str, "World", "easyc");
+   string_replace(str, "World", "libstd");
    ```
 
 #### Example usage
 
 ```c
-#include <easyc/base_string.h>
+#include <libstd/base_string.h>
 #include <stdio.h>
 
 int main() {
@@ -58,7 +58,7 @@ int main() {
 
     printf("Length: %zu, Capacity: %zu\n", string_length(str), string_capacity(str));
 
-    string_replace(str, "World", "easyc");
+    string_replace(str, "World", "libstd");
     printf("After replacement: %s\n", string_to_c(str));
 
     string_destroy(str);

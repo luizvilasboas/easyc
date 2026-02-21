@@ -38,7 +38,7 @@ The `stack` module implements a Last-In-First-Out (LIFO) stack with generic data
 #### Example usage
 
 ```c
-#include <easyc/data_structures/stack.h>
+#include <libstd/data_structures/stack.h>
 #include <stdio.h>
 
 int main() {

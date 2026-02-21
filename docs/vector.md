@@ -38,7 +38,7 @@ The `vector` module implements a dynamic array (vector) for efficient sequential
 #### Example usage
 
 ```c
-#include <easyc/data_structures/vector.h>
+#include <libstd/data_structures/vector.h>
 #include <stdio.h>
 
 int compare_ints(void *a, void *b) {

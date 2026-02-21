@@ -1,10 +1,10 @@
-# easyc
+# libstd
 
 > A C library designed to simplify working with common data structures and string manipulation.
 
 ## About the Project
 
-`easyc` is a library written in C that provides easy-to-use implementations of fundamental data structures and a custom string type. It aims to reduce boilerplate and simplify development for C projects that require dynamic arrays, stacks, queues, or hash tables.
+`libstd` is a library written in C that provides easy-to-use implementations of fundamental data structures and a custom string type. It aims to reduce boilerplate and simplify development for C projects that require dynamic arrays, stacks, queues, or hash tables.
 
 Key features include:
 *   **String Manipulation**: A custom string type with functions to create, destroy, and query size/capacity.
@@ -47,12 +47,12 @@ Follow the steps below:
 
 1.  **Clone the repository**
     ```bash
-    git clone https://github.com/luizvilasboas/easyc.git
+    git clone https://github.com/luizvilasboas/libstd.git
     ```
 
 2.  **Navigate to the project directory**
     ```bash
-    cd easyc
+    cd libstd
     ```
 
 3.  **Compile the library**
@@ -67,20 +67,20 @@ Follow the steps below:
 
 ### Workflow
 
-To use the library in your own project, include the necessary headers and link against the `easyc` library during compilation.
+To use the library in your own project, include the necessary headers and link against the `libstd` library during compilation.
 
 1.  **Include headers in your C file:**
     ```c
-    #include <easyc/base_string.h>
-    #include <easyc/data_structures/vector.h>
+    #include <libstd/base_string.h>
+    #include <libstd/data_structures/vector.h>
     // ... and so on for other structures
     ```
 
 2.  **Compile your program:**
     ```bash
-    gcc -o my_program my_program.c -I/usr/local/include/easyc -L/usr/local/lib/easyc -leasyc
+    gcc -o my_program my_program.c -I/usr/local/include/libstd -L/usr/local/lib/libstd -libstd
     ```
-    For more detailed examples, please refer to the [docs](https://github.com/luizvilasboas/easyc/tree/main/docs).
+    For more detailed examples, please refer to the [docs](https://github.com/luizvilasboas/libstd/tree/main/docs).
 
 ### Testing
 

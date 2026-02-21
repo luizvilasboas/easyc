@@ -38,7 +38,7 @@ The `hashmap` module implements a hash map with user-defined hash and comparison
 #### Example usage
 
 ```c
-#include <easyc/data_structures/hashmap.h>
+#include <libstd/data_structures/hashmap.h>
 #include <stdio.h>
 #include <string.h>
 
