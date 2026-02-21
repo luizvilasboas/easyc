@@ -1,4 +1,5 @@
 #### **Abstract**
+
 The `base_string` module provides a custom string type with advanced manipulation capabilities such as dynamic resizing, substring operations, and concatenation.
 
 #### **Functions and Usage**
@@ -6,6 +7,7 @@ The `base_string` module provides a custom string type with advanced manipulatio
 1. **`string_create(const char *initial)`**  
    Creates a new `string` object initialized with the given value.  
    **Usage:**
+
    ```c
    string *str = string_create("Hello");
    ```
@@ -13,6 +15,7 @@ The `base_string` module provides a custom string type with advanced manipulatio
 2. **`string_destroy(string *str)`**  
    Frees memory allocated for the string.  
    **Usage:**
+
    ```c
    string_destroy(str);
    ```
@@ -20,6 +23,7 @@ The `base_string` module provides a custom string type with advanced manipulatio
 3. **`string_length(const string *str)`**  
    Returns the length of the string.  
    **Usage:**
+
    ```c
    size_t len = string_length(str);
    ```
@@ -27,6 +31,7 @@ The `base_string` module provides a custom string type with advanced manipulatio
 4. **`string_concat(string *str, const char *suffix)`**  
    Appends a suffix to the string.  
    **Usage:**
+
    ```c
    string_concat(str, " World");
    ```
@@ -60,4 +65,3 @@ int main() {
     return 0;
 }
 ```
-

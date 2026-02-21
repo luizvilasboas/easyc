@@ -4,9 +4,9 @@
 #include <stddef.h>
 
 typedef struct {
-    char *data;
-    size_t size;
-    size_t capacity;
+  char *data;
+  size_t size;
+  size_t capacity;
 } string;
 
 string *string_create(const char *initial);
@@ -20,7 +20,9 @@ char *string_to_c(const string *str);
 void string_reserve(string *str, size_t new_capacity);
 void string_set(string *str, const char *new_value);
 int string_contains(const string *str, const char *substring);
-string **string_split(const string *str, const char *delimiter, size_t *num_tokens);
-void string_replace(string *str, const char *old_substring, const char *new_substring);
+string **string_split(const string *str, const char *delimiter,
+                      size_t *num_tokens);
+void string_replace(string *str, const char *old_substring,
+                    const char *new_substring);
 
-#endif // BASE_STRING_H_
+#endif  // BASE_STRING_H_

@@ -1,18 +1,18 @@
 #ifndef VECTOR_H_
 #define VECTOR_H_
 
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 typedef struct VectorNode {
-    void *data;
-    struct VectorNode *next;
+  void *data;
+  struct VectorNode *next;
 } VectorNode;
 
 typedef struct Vector {
-    VectorNode *head;
-    size_t element_size;
-    size_t size;
+  VectorNode *head;
+  size_t element_size;
+  size_t size;
 } Vector;
 
 void vector_init(Vector *vector, size_t element_size);
@@ -25,4 +25,4 @@ int vector_search(Vector *vector, int (*cmp_fn)(void *, void *), void *key);
 int vector_size(Vector *vector);
 bool vector_sort(Vector *vector, int (*cmp_fn)(void *, void *));
 
-#endif // VECTOR_H_
+#endif  // VECTOR_H_

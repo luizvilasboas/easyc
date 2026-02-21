@@ -1,18 +1,18 @@
 #ifndef STACK_H_
 #define STACK_H_
 
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 typedef struct StackNode {
-    void *data;
-    struct StackNode *next;
+  void *data;
+  struct StackNode *next;
 } StackNode;
 
 typedef struct {
-    StackNode *top;
-    size_t element_size;
-    size_t size;
+  StackNode *top;
+  size_t element_size;
+  size_t size;
 } Stack;
 
 void stack_init(Stack *stack, size_t element_size);
@@ -23,4 +23,4 @@ void *stack_top(Stack *stack);
 int stack_search(Stack *stack, int (*cmp_fn)(void *, void *), void *key);
 int stack_size(Stack *stack);
 
-#endif // STACK_H_
+#endif  // STACK_H_

@@ -1,4 +1,5 @@
 #### **Abstract**
+
 The `queue` module implements a generic First-In-First-Out (FIFO) queue with dynamic sizing.
 
 #### **Functions and Usage**
@@ -6,6 +7,7 @@ The `queue` module implements a generic First-In-First-Out (FIFO) queue with dyn
 1. **`queue_init(Queue *queue, size_t element_size)`**  
    Initializes a queue with a specified element size.  
    **Usage:**
+
    ```c
    queue_init(&queue, sizeof(int));
    ```
@@ -13,6 +15,7 @@ The `queue` module implements a generic First-In-First-Out (FIFO) queue with dyn
 2. **`queue_push(Queue *queue, void *data)`**  
    Adds an element to the back of the queue.  
    **Usage:**
+
    ```c
    queue_push(&queue, &data);
    ```
@@ -20,6 +23,7 @@ The `queue` module implements a generic First-In-First-Out (FIFO) queue with dyn
 3. **`queue_pop(Queue *queue)`**  
    Removes the front element of the queue.  
    **Usage:**
+
    ```c
    queue_pop(&queue);
    ```

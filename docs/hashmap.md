@@ -1,4 +1,5 @@
 #### **Abstract**
+
 The `hashmap` module implements a hash map with user-defined hash and comparison functions, allowing efficient storage and retrieval of key-value pairs.
 
 #### **Functions and Usage**
@@ -6,6 +7,7 @@ The `hashmap` module implements a hash map with user-defined hash and comparison
 1. **`hashmap_init(HashMap *map, size_t bucket_count, size_t key_size, size_t value_size, hash_fn, cmp_fn)`**  
    Initializes a hash map with the specified parameters.  
    **Usage:**
+
    ```c
    hashmap_init(&map, 10, sizeof(char *), sizeof(int), hash_fn, cmp_fn);
    ```
@@ -13,6 +15,7 @@ The `hashmap` module implements a hash map with user-defined hash and comparison
 2. **`hashmap_insert(HashMap *map, void *key, void *data)`**  
    Inserts a key-value pair into the map.  
    **Usage:**
+
    ```c
    hashmap_insert(&map, "key", &value);
    ```
@@ -20,6 +23,7 @@ The `hashmap` module implements a hash map with user-defined hash and comparison
 3. **`hashmap_get(HashMap *map, void *key)`**  
    Retrieves the value associated with a key.  
    **Usage:**
+
    ```c
    int *value = hashmap_get(&map, "key");
    ```

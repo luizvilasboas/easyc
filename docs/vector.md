@@ -1,4 +1,5 @@
 #### **Abstract**
+
 The `vector` module implements a dynamic array (vector) for efficient sequential storage of elements.
 
 #### **Functions and Usage**
@@ -6,6 +7,7 @@ The `vector` module implements a dynamic array (vector) for efficient sequential
 1. **`vector_init(Vector *vector, size_t element_size)`**  
    Initializes a vector for elements of the specified size.  
    **Usage:**
+
    ```c
    vector_init(&vector, sizeof(int));
    ```
@@ -13,6 +15,7 @@ The `vector` module implements a dynamic array (vector) for efficient sequential
 2. **`vector_insert(Vector *vector, void *data)`**  
    Inserts an element into the vector.  
    **Usage:**
+
    ```c
    vector_insert(&vector, &data);
    ```
@@ -20,6 +23,7 @@ The `vector` module implements a dynamic array (vector) for efficient sequential
 3. **`vector_remove(Vector *vector, size_t index)`**  
    Removes an element at the specified index.  
    **Usage:**
+
    ```c
    vector_remove(&vector, 0);
    ```

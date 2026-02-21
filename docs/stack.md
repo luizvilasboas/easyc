@@ -1,4 +1,5 @@
 #### **Abstract**
+
 The `stack` module implements a Last-In-First-Out (LIFO) stack with generic data type support.
 
 #### **Functions and Usage**
@@ -6,6 +7,7 @@ The `stack` module implements a Last-In-First-Out (LIFO) stack with generic data
 1. **`stack_init(Stack *stack, size_t element_size)`**  
    Initializes a stack for elements of the specified size.  
    **Usage:**
+
    ```c
    stack_init(&stack, sizeof(int));
    ```
@@ -13,6 +15,7 @@ The `stack` module implements a Last-In-First-Out (LIFO) stack with generic data
 2. **`stack_push(Stack *stack, void *data)`**  
    Pushes an element onto the stack.  
    **Usage:**
+
    ```c
    stack_push(&stack, &data);
    ```
@@ -20,6 +23,7 @@ The `stack` module implements a Last-In-First-Out (LIFO) stack with generic data
 3. **`stack_pop(Stack *stack)`**  
    Removes the top element from the stack.  
    **Usage:**
+
    ```c
    stack_pop(&stack);
    ```
