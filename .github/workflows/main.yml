@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags:
-      - "*"
+      - "v*"
   pull_request:
 
 jobs:
@@ -15,7 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y clang make check valgrind clang-format
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang make check valgrind clang-format
       - name: Lint
         run: make lint
       - name: Build
@@ -27,6 +29,7 @@ jobs:
 
   deploy:
     if: startsWith(github.ref, 'refs/tags/')
+    needs: build-and-test
     runs-on: ubuntu-latest
     permissions:
       contents: read
