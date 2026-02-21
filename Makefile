@@ -17,6 +17,8 @@ OBJ = $(patsubst $(SRC_DIR)/%.c, $(BIN_DIR)/%.o, $(SRC))
 
 TEST_BINARIES = $(patsubst $(TEST_DIR)/%.c,  	$(BIN_DIR)/%, $(TEST_SRC))
 
+ALL_SOURCE_FILES = $(shell find $(SRC_DIR) $(TEST_DIR) $(INCLUDE_DIR) -name "*.c" -o -name "*.h")
+
 LIB_NAME = easyc
 SHARED_LIB = $(LIB_DIR)/lib$(LIB_NAME).so
 STATIC_LIB = $(LIB_DIR)/lib$(LIB_NAME).a
@@ -77,6 +79,12 @@ leak: $(TEST_BINARIES)
 			--error-exitcode=1 \
 			$$test_bin; \
 	done
+
+format: $(ALL_SOURCE_FILES)
+	clang-format -i $(ALL_SOURCE_FILES)
+
+lint: $(ALL_SOURCE_FILES)
+	clang-format --dry-run --Werror $(ALL_SOURCE_FILES)
 
 clean:
 	rm -rf $(BIN_DIR) $(LIB_DIR)
