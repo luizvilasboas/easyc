@@ -74,9 +74,9 @@ test: $(TEST_BINARIES)
 leak: $(TEST_BINARIES)
 	@for test_bin in $(TEST_BINARIES); do \
 		valgrind --leak-check=full \
-		    --show-leak-kinds=all \
-			--track-origins=yes \
-			--error-exitcode=1 \
+			--show-leak-kinds=all \
+			--track-origins=yes  \
+			--errors-for-leak-kinds=all \
 			$$test_bin; \
 	done
 

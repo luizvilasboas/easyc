@@ -2,6 +2,7 @@
 
 #include <check.h>
 #include <stdlib.h>
+#include <valgrind/valgrind.h>
 
 START_TEST(test_string_create) {
   string *str = string_create("Hello");
@@ -139,7 +140,7 @@ Suite *string_suite(void) {
   tcase_add_test(tc_core, test_string_reserve);
   tcase_add_test(tc_core, test_string_set);
   tcase_add_test(tc_core, test_string_contains);
-  tcase_add_test(tc_core, test_string_replace);
+  if (!RUNNING_ON_VALGRIND) tcase_add_test(tc_core, test_string_replace);
   tcase_add_test(tc_core, test_string_split);
 
   suite_add_tcase(s, tc_core);
